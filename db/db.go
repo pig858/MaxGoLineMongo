@@ -4,15 +4,20 @@ import (
 	"context"
 	"log"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Message struct {
+	UserID  string `bson:userId, omitempty`
 	Name    string `bson:name, omitempty`
 	Content string `bson:content, omitempty`
-	Time    int64  `bson:sendTime, omitempty`
+	Time    string `bson:sendTime, omitempty`
+}
+type Follower struct {
+	Name   string `bson:name, omitempty`
+	UserID string `bson:userId, omitempty`
+	Time   string `bson:sendTime, omitempty`
 }
 
 var (
@@ -38,25 +43,33 @@ func Connect(host string, port string) *mongo.Client {
 	return client
 }
 
-func GetByName(collection *mongo.Collection, name string) []Message {
-	var messages []Message
+func GetByFilter[T interface{}](collection *mongo.Collection, filter interface{}) []T {
+	var res []T
 
-	filter := bson.D{{"name", name}}
 	cursor, err := collection.Find(Ctx, filter)
 
 	if err != nil {
 		panic(err)
 	}
 
-	if err = cursor.All(Ctx, &messages); err != nil {
+	if err = cursor.All(Ctx, &res); err != nil {
 		panic(err)
 	}
-	return messages
+	return res
 }
 
-func Insert(collection *mongo.Collection, message Message) {
-	_, err := collection.InsertOne(Ctx, message)
+func Insert(collection *mongo.Collection, data any) {
+	_, err := collection.InsertOne(Ctx, data)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func Delete(collection *mongo.Collection, filter interface{}) {
+
+	_, err := collection.DeleteOne(Ctx, filter)
+	if err != nil {
+		panic(err)
+	}
+
 }
