@@ -4,6 +4,7 @@ import (
 	// "github.com/pig858/MaxGoLineMongo/db"
 	"MaxGoLineMongo/db"
 	"context"
+	"time"
 
 	"log"
 	"net/http"
@@ -29,7 +30,6 @@ func main() {
 	defer client.Disconnect(context.TODO())
 	//db connect end
 
-	err = client.Ping(context.TODO(), nil)
 	//db test start
 	database := client.Database("line")
 	messageCollection := database.Collection("Message")
@@ -40,10 +40,6 @@ func main() {
 	// }
 	// db.Insert(messageCollection, testMessage)
 
-	if err != nil {
-		log.Fatal(err)
-	}
-	//db connect end
 	// targetMessage := db.GetByName(messageCollection, "test")
 	// fmt.Println(targetMessage)
 	//db test end
@@ -60,7 +56,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r.POST("/callback", func(c *gin.Context) {
+	r.POST("/receive", func(c *gin.Context) {
 		events, err := bot.ParseRequest(c.Request)
 		if err != nil {
 			if err == linebot.ErrInvalidSignature {
@@ -72,9 +68,12 @@ func main() {
 			if event.Type == linebot.EventTypeMessage {
 				switch message := event.Message.(type) {
 				case *linebot.TextMessage:
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
-						log.Print(err)
+					receiveMessage := db.Message{
+						Name:    event.Source.UserID,
+						Content: message.Text,
+						Time:    time.Now().Unix(),
 					}
+					db.Insert(messageCollection, receiveMessage)
 				}
 			}
 		}
