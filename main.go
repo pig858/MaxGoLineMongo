@@ -1,15 +1,16 @@
 package main
 
 import (
+	// "github.com/pig858/MaxGoLineMongo/db"
+	"MaxGoLineMongo/db"
 	"context"
+
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
@@ -24,20 +25,28 @@ func main() {
 	}
 
 	// db connent start
-	dbConnectURI := "mongodb://" + viper.GetString("DB.Host") + ":" + viper.GetString("DB.Port")
-	clientOptions := options.Client().ApplyURI(dbConnectURI)
-	client, err := mongo.Connect(context.TODO(), clientOptions)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	client := db.Connect(viper.GetString("DB.Host"), viper.GetString("DB.Port"))
+	defer client.Disconnect(context.TODO())
+	//db connect end
 
 	err = client.Ping(context.TODO(), nil)
+	//db test start
+	database := client.Database("line")
+	messageCollection := database.Collection("Message")
+	// testMessage := db.Message{
+	// 	Name:    "test",
+	// 	Content: "test",
+	// 	Time:    time.Now().Unix(),
+	// }
+	// db.Insert(messageCollection, testMessage)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 	//db connect end
+	// targetMessage := db.GetByName(messageCollection, "test")
+	// fmt.Println(targetMessage)
+	//db test end
 
 	// gin setup test
 	r := gin.Default()
