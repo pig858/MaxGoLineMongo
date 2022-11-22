@@ -1,7 +1,7 @@
 {
 	"Line":{
-		"Secret": "ec84feea7d07b03fa18e13f18e1720e8",
-		"Token": "W98a9cv49dQDL8rSr+e/V+SPf+94pyndHA0QrpzZeAB6YwogEy2x6zXn8KhJzUI6B/4VHV2Eng0QDoKrD+5uAwAQABLaEIp6nTGxLzuwtMGGNWCfYA6fbVqVZJF8KlZqeqzQDvoxZNNn2ee6sZDpYQdB04t89/1O/w1cDnyilFU="
+		"Secret": "SECRET",
+		"Token": "TOKEN"
 	},
 	"DB":{
 		"Host": "localhost",
