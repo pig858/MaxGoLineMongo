@@ -78,7 +78,7 @@ func main() {
 	})
 
 	r.GET("/sendMsgToLine", func(c *gin.Context) {
-		if _, err := bot.PushMessage("U24407c0d7e4a7d85dddc3140cff3d6ea", linebot.NewTextMessage("hello")).Do(); err != nil {
+		if _, err := bot.PushMessage("<<UserId>>", linebot.NewTextMessage("hello")).Do(); err != nil {
 			panic(err)
 		}
 	})
